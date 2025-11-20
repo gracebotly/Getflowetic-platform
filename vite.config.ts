@@ -1,49 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import electron from 'vite-plugin-electron';
-import renderer from 'vite-plugin-electron-renderer';
 
 export default defineConfig({
   base: './',
-  plugins: [
-    react(),
-    electron([
-      {
-        entry: 'electron/main.ts',
-        onstart(options) {
-          options.reload();
-        },
-        vite: {
-          build: {
-            sourcemap: true,
-            minify: process.env.NODE_ENV === 'production',
-            outDir: 'dist-electron',
-            rollupOptions: {
-              external: ['electron', 'path', 'fs'],
-            },
-          },
-        },
-      },
-      {
-        entry: 'electron/preload.ts',
-        onstart(options) {
-          options.reload();
-        },
-        vite: {
-          build: {
-            sourcemap: 'inline',
-            minify: process.env.NODE_ENV === 'production',
-            outDir: 'dist-electron',
-            rollupOptions: {
-              external: ['electron', 'path', 'fs'],
-            },
-          },
-        },
-      },
-    ]),
-    renderer(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './app'),
