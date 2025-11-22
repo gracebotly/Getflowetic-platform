@@ -147,8 +147,7 @@
     "vite-plugin-optimize-css-modules": "^1.1.0",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.1.7",
-    "@remix-run/node": "^2.13.1",
-    "@remix-run/serve": "^2.13.1"
+    "@remix-run/cloudflare": "^2.13.1"
   },
   "engines": {
     "node": ">=18.18.0"
