@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Split from 'react-split';
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { EditorPane } from '@/components/editor/editor-pane';
 import { PreviewPane } from '@/components/preview/preview-pane';
 import { ChatInterface } from '@/components/chat/chat-interface';
@@ -18,17 +18,8 @@ export function EditorPage() {
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
 
   return (
-    <div className="flex h-full flex-col">
-      <Split
-        className="flex h-full"
-        sizes={[20, 60, 20]}
-        minSize={[200, 300, 300]}
-        expandToMin
-        gutterAlign="center"
-        snapOffset={30}
-        dragInterval={1}
-        direction="horizontal"
-      >
+    <PanelGroup direction="horizontal" className="flex h-full">
+      <Panel defaultSize={20} minSize={15}>
         <div className="flex h-full border-r border-border/40">
           {showFileManager && (
             <div className="h-full w-full overflow-auto">
@@ -47,24 +38,28 @@ export function EditorPage() {
             </div>
           )}
         </div>
+      </Panel>
 
-        <div className="flex h-full flex-col">
-          <Split
-            className="flex flex-1 flex-col"
-            sizes={[100]}
-            minSize={[300]}
-            direction="vertical"
-          >
+      <PanelResizeHandle className="w-2 bg-border/40" />
+
+      <Panel defaultSize={60} minSize={30}>
+        <PanelGroup direction="vertical" className="flex h-full flex-col">
+          <Panel defaultSize={isPreviewVisible ? 100 : 70} minSize={30}>
             <div className="flex-1 overflow-hidden">
               <EditorPane />
             </div>
+          </Panel>
 
-            {showTerminal && (
-              <div className="border-t border-border/40">
-                <TerminalPane />
-              </div>
-            )}
-          </Split>
+          {showTerminal && (
+            <>
+              <PanelResizeHandle className="h-2 bg-border/40" />
+              <Panel defaultSize={30} minSize={20}>
+                <div className="border-t border-border/40 h-full">
+                  <TerminalPane />
+                </div>
+              </Panel>
+            </>
+          )}
 
           <div className="flex gap-2 border-t border-border/40 p-2">
             <Button
@@ -92,8 +87,12 @@ export function EditorPage() {
               {isPreviewVisible ? 'Hide Preview' : 'Show Preview'}
             </Button>
           </div>
-        </div>
+        </PanelGroup>
+      </Panel>
 
+      <PanelResizeHandle className="w-2 bg-border/40" />
+
+      <Panel defaultSize={20} minSize={15}>
         <div className="flex h-full border-l border-border/40">
           {isPreviewVisible && (
             <div className="flex-1">
@@ -107,13 +106,18 @@ export function EditorPage() {
             </div>
           )}
         </div>
-      </Split>
+      </Panel>
 
       {showChat && (
-        <div className="border-t border-border/40">
-          <ChatInterface />
-        </div>
+        <>
+          <PanelResizeHandle className="w-2 bg-border/40" />
+          <Panel defaultSize={30} minSize={20}>
+            <div className="border-t border-border/40">
+              <ChatInterface />
+            </div>
+          </Panel>
+        </>
       )}
-    </div>
+    </PanelGroup>
   );
 }
