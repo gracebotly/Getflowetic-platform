@@ -46,6 +46,7 @@ export default defineConfig((config) => {
       config.mode !== 'test' && remixCloudflareDevProxy(),
       remixVitePlugin({
         serverModuleFormat: 'cjs',
+        server: '@remix-run/node',
         future: {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,
