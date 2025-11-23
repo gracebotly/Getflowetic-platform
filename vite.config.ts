@@ -43,7 +43,7 @@ export default defineConfig((config) => {
           return null;
         },
       },
-      config.mode !== 'test' && remixCloudflareDevProxy(),
+      // config.mode !== 'test' && remixCloudflareDevProxy(),
       remixVitePlugin({
         serverModuleFormat: 'esm',
         server: 'cloudflare-pages',
