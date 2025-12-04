@@ -405,13 +405,67 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-<div align="center">
+📝 Suggested README Section: “How to Get Updates from Original Project”
 
-Built with ❤️ by the Bolt-Chef Unified team
+You can paste this directly into your README.md:
 
-[Website](https://bolt-chef-unified.com) •
-[Documentation](https://docs.bolt-chef-unified.com) •
-[Discord](https://discord.gg/bolt-chef) •
-[Twitter](https://twitter.com/boltchef)
+🔄 How to Pull Updates from Original Project
 
-</div>
+This project is based on bolt-chef-unified-v2
+, but lives in a private repo for customization and white-labeling.
+
+To update your codebase with improvements from the original repo:
+
+# Step 1: Fetch updates from the original repo
+git fetch upstream
+
+# Step 2: Review new commits (optional)
+git log upstream/main --oneline
+
+# Step 3: Merge changes into your current branch
+git merge upstream/main
+
+# Step 4: Resolve any merge conflicts (if they exist)
+# Git will show you which files need to be fixed
+
+# Step 5: Push the updated code to your private repo
+git push origin main
+
+
+🧠 Note:
+
+upstream refers to the original project:
+https://github.com/you3333ef/bolt-chef-unified-v2.git
+
+origin is your private repo (this one):
+https://github.com/gracebotly/Getflowetic-platform.git
+
+🧪 Best Practice Before Merging
+
+It's smart to test updates first:
+
+# Create a test branch from your current main
+git checkout -b test-updates
+
+# Merge original changes into test branch
+git merge upstream/main
+
+# Run and test locally
+pnpm dev
+
+# If all good, merge into main
+git checkout main
+git merge test-updates
+git push origin main
+
+# Clean up test branch
+git branch -D test-updates
+
+
+✅ This gives you full control:
+
+Keep your private code and branding
+
+Still get improvements from the original repo
+
+Safely handle conflicts if needed
