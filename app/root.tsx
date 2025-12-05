@@ -1,7 +1,6 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import { AuthProvider } from './providers/AuthProvider';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
@@ -146,10 +145,8 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <Layout>
-        <Outlet />
-      </Layout>
-    </AuthProvider>
+    <Layout>
+      <Outlet />
+    </Layout>
   );
 }
