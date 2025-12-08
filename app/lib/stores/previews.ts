@@ -1,5 +1,6 @@
 import type { WebContainer } from '@webcontainer/api';
 import { atom } from 'nanostores';
+import { webcontainer } from '~/lib/webcontainer';
 
 // Extend Window interface to include our custom property
 declare global {
@@ -302,12 +303,7 @@ let previewsStore: PreviewsStore | null = null;
 
 export function usePreviewStore() {
   if (!previewsStore) {
-    /*
-     * Initialize with a Promise that resolves to WebContainer
-     * This should match how you're initializing WebContainer elsewhere
-     */
-    previewsStore = new PreviewsStore(Promise.resolve({} as WebContainer));
+    previewsStore = new PreviewsStore(webcontainer);
   }
-
   return previewsStore;
 }
