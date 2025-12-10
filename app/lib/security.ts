@@ -182,6 +182,7 @@ export function withSecurity<T extends (args: ActionFunctionArgs | LoaderFunctio
     const { request } = args;
     const url = new URL(request.url);
     const endpoint = url.pathname;
+    const env = (args as any)?.context?.cloudflare?.env as Record<string, string> | undefined;
 
     // Check allowed methods
     if (options.allowedMethods && !options.allowedMethods.includes(request.method)) {
@@ -189,6 +190,22 @@ export function withSecurity<T extends (args: ActionFunctionArgs | LoaderFunctio
         status: 405,
         headers: createSecurityHeaders(),
       });
+    }
+
+    // Enforce authentication if required
+    if (options.requireAuth) {
+      const adminTokenEnv =
+        (env?.ADMIN_API_TOKEN as string | undefined) ?? process.env.ADMIN_API_TOKEN;
+      const authHeader = request.headers.get('Authorization') || '';
+      const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+      const altHeader = request.headers.get('X-Admin-Token') || undefined;
+      const provided = bearer || altHeader;
+      if (!adminTokenEnv || !provided || provided !== adminTokenEnv) {
+        return new Response('Unauthorized', {
+          status: 401,
+          headers: createSecurityHeaders(),
+        });
+      }
     }
 
     // Apply rate limiting

@@ -144,13 +144,10 @@ export function updateSupabaseConnection(connection: Partial<SupabaseConnectionS
 }
 
 export function initializeSupabaseConnection() {
-  // Auto-connect using environment variable if available
-  const envToken = import.meta.env?.VITE_SUPABASE_ACCESS_TOKEN;
-
-  if (envToken && !supabaseConnection.get().token) {
-    updateSupabaseConnection({ token: envToken });
-    fetchSupabaseStats(envToken).catch(console.error);
-  }
+  // SECURITY: Supabase management tokens are server-only
+  // Client-side auto-connection using VITE_SUPABASE_ACCESS_TOKEN has been disabled
+  // Users must manually enter their Supabase access token in the UI
+  // This prevents management tokens from being exposed in client bundles
 }
 
 export async function fetchSupabaseStats(token: string) {

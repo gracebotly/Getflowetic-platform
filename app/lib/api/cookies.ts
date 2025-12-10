@@ -22,9 +22,12 @@ export function parseCookies(cookieHeader: string | null) {
   return cookies;
 }
 
-export function getApiKeysFromCookie(cookieHeader: string | null): Record<string, string> {
-  const cookies = parseCookies(cookieHeader);
-  return cookies.apiKeys ? JSON.parse(cookies.apiKeys) : {};
+/**
+ * Deprecated: Reading client-stored API keys is disabled for security.
+ * Always returns an empty object.
+ */
+export function getApiKeysFromCookie(_cookieHeader: string | null): Record<string, string> {
+  return {};
 }
 
 export function getProviderSettingsFromCookie(cookieHeader: string | null): Record<string, any> {
