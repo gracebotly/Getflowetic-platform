@@ -5,6 +5,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 // Load environment variables from multiple files
 dotenv.config({ path: '.env.local' });
@@ -18,6 +19,15 @@ export default defineConfig((config) => {
     },
     build: {
       target: 'esnext',
+    },
+    resolve: {
+      alias: {
+        'node:util/types': fileURLToPath(new URL('./shims/node-util-types.js', import.meta.url)),
+        'util/types': fileURLToPath(new URL('./shims/node-util-types.js', import.meta.url)),
+      },
+    },
+    optimizeDeps: {
+      exclude: ['undici', '@remix-run/node'],
     },
     plugins: [
       nodePolyfills({
