@@ -80,7 +80,7 @@ export const TAB_DESCRIPTIONS: Record<TabType, string> = {
   data: 'Manage your data and storage',
   'cloud-providers': 'Configure cloud AI providers and models',
   'local-providers': 'Configure local AI providers and models',
-  github: 'Manage client list, magic links, and connection details',
+  github: 'Manage client relationships and dashboards',
   gitlab: 'View dashboard gallery, deploy projects, and preview settings',
   netlify: 'Connect AI agents and manage webhooks',
   vercel: 'Configure logo, brand colors, custom domains, and footer',
