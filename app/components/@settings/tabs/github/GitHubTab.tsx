@@ -1145,3 +1145,5 @@ export function ClientsTab() {
     </div>
   );
 }
+
+export default ClientsTab;
