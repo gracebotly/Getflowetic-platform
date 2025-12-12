@@ -10,7 +10,7 @@ import { Workbench } from '~/components/workbench/Workbench.client';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST } from '~/utils/constants';
 import { Messages } from './Messages.client';
-import { getApiKeysFromCookies } from './APIKeyManager';
+import { getApiKeysFromCookie } from '~/lib/api/cookies';
 import Cookies from 'js-cookie';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import styles from './BaseChat.module.scss';
@@ -134,7 +134,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
-    const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookies());
+    const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookie(null));
     const [modelList, setModelList] = useState<ModelInfo[]>([]);
     const [isModelSettingsCollapsed, setIsModelSettingsCollapsed] = useState(false);
     const [isListening, setIsListening] = useState(false);
@@ -204,7 +204,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         let parsedApiKeys: Record<string, string> | undefined = {};
 
         try {
-          parsedApiKeys = getApiKeysFromCookies();
+          parsedApiKeys = getApiKeysFromCookie(null);
           setApiKeys(parsedApiKeys);
         } catch (error) {
           console.error('Error loading API keys from cookies:', error);
