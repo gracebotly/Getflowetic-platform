@@ -1,6 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import * as RadixDialog from '@radix-ui/react-dialog';
+import { useRouteLoaderData } from '@remix-run/react';
+import { useMutation } from 'convex/react';
+import { api } from '~/convex/_generated/api';
+import type { loader as rootLoader } from '~/root';
 import { classNames } from '~/utils/classNames';
 import { TabTile } from '~/components/@settings/shared/components/TabTile';
 import { useFeatures } from '~/lib/hooks/useFeatures';
@@ -46,6 +50,11 @@ const BetaLabel = () => (
 
 export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   // State
+  // WorkOS user sync
+  const hasSyncedRef = useRef(false);
+  const rootData = useRouteLoaderData<typeof rootLoader>('root');
+  const workosUser = rootData?.user;
+  const syncUser = useMutation(api.users.syncUser);
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
   const [showTabManagement, setShowTabManagement] = useState(false);
@@ -103,6 +112,26 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
       setActiveTab(null);
     }
   }, [open]);
+
+  // Sync WorkOS user to Convex when Control Panel opens
+  useEffect(() => {
+    if (!open) return;
+    if (hasSyncedRef.current) return;
+    if (!workosUser?.id || !workosUser?.email) return;
+
+    syncUser({
+      workosId: workosUser.id,
+      email: workosUser.email,
+      name: `${workosUser.firstName || ''} ${workosUser.lastName || ''}`.trim() || workosUser.email,
+    })
+      .then(() => {
+        hasSyncedRef.current = true;
+        console.log('✅ User synced to Convex:', workosUser.email);
+      })
+      .catch((error) => {
+        console.error('❌ Failed to sync user:', error);
+      });
+  }, [open, workosUser, syncUser]);
 
   // Handle closing
   const handleClose = () => {
