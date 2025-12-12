@@ -673,4 +673,4 @@ export function GitHubTab() {
   );
 }
 
-export default ClientsTab;
+export default GitHubTab;
