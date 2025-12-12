@@ -36,7 +36,7 @@ interface ControlPanelProps {
 }
 
 // Beta status for experimental features
-const BETA_TABS = new Set<TabType>(['local-providers', 'mcp']);
+const BETA_TABS = new Set<TabType>(['local-providers', 'mcp', 'coming-soon']);
 
 const BetaLabel = () => (
   <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20">
@@ -151,6 +151,8 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
         return <EventLogsTab />;
       case 'mcp':
         return <McpTab />;
+      case 'coming-soon':
+        return null; // Disabled placeholder panel
 
       default:
         return null;
@@ -196,6 +198,11 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   };
 
   const handleTabClick = (tabId: TabType) => {
+    // Disable clicking on coming-soon placeholder
+    if (tabId === 'coming-soon') {
+      return;
+    }
+
     setLoadingTab(tabId);
     setActiveTab(tabId);
     setShowTabManagement(false);
@@ -310,7 +317,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                             key={tab.id}
                             className={classNames(
                               'aspect-[1.5/1] transition-transform duration-100 ease-out',
-                              'hover:scale-[1.01]',
+                              tab.id === 'coming-soon' ? 'opacity-60 cursor-not-allowed' : 'hover:scale-[1.01]',
                             )}
                             style={{
                               animationDelay: `${index * 30}ms`,
