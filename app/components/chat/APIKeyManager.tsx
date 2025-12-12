@@ -26,7 +26,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
   useEffect(() => {
     setIsEditing(false);
     setTempKey('');
-    setApiKey(''); // do not keep secrets in client state
+    // Removed setApiKey('') - not needed with server-side secure storage
     (async () => {
       try {
         const res = await fetch(`/api/byok?provider=${encodeURIComponent(provider.name)}`, { credentials: 'same-origin' });
@@ -40,7 +40,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
         setMaskedKey('');
       }
     })();
-  }, [provider.name, setApiKey]);
+  }, [provider.name]);
 
   const checkEnvApiKey = useCallback(async () => {
     // Check cache first
@@ -79,7 +79,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
       const data = await res.json() as { masked: string };
       setMaskedKey(data.masked);
       setTempKey('');
-      setApiKey(''); // never retain secrets in client state
+      // Removed setApiKey('') - not needed with server-side storage
       setIsEditing(false);
     } catch (e) {
       console.error(e);
@@ -95,7 +95,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
       if (!res.ok) throw new Error('Failed to remove key');
       setMaskedKey('');
       setTempKey('');
-      setApiKey('');
+      // Removed setApiKey('') - not needed with server-side storage
       setIsEditing(false);
     } catch (e) {
       console.error(e);
