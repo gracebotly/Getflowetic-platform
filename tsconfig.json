@@ -27,10 +27,7 @@
       "@/types/*": ["./app/types/*"],
       "@/stores/*": ["./app/stores/*"]
     },
-    "noEmitOptions": {
-      "entries": ["./app/node_modules/convex/package.json", "./node_modules/convex/package.json"]
-    }
   },
-  "include": ["app", "convex", "vite.config.ts"],
+  "include": ["app", "convex"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

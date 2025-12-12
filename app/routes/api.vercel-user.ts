@@ -1,25 +1,16 @@
 import { json } from '@remix-run/cloudflare';
-import { getApiKeysFromCookie } from '~/lib/api/cookies';
 import { withSecurity } from '~/lib/security';
 
 async function vercelUserLoader({ request, context }: { request: Request; context: any }) {
   try {
-    // Get API keys from cookies (server-side only)
-    const cookieHeader = request.headers.get('Cookie');
-    const apiKeys = getApiKeysFromCookie(cookieHeader);
-
-    // Try to get Vercel token from various sources
-    let vercelToken =
-      apiKeys.VITE_VERCEL_ACCESS_TOKEN ||
-      context?.cloudflare?.env?.VITE_VERCEL_ACCESS_TOKEN ||
-      process.env.VITE_VERCEL_ACCESS_TOKEN;
-
-    // Also check for token in request headers (for direct API calls)
+    // Server-only Vercel token (no client cookies, no VITE_ variables)
+    const env = (context as any)?.cloudflare?.env as Record<string, string> | undefined;
+    let vercelToken = env?.VERCEL_ACCESS_TOKEN || process.env.VERCEL_ACCESS_TOKEN;
+    // Optional: Allow explicit Authorization header for direct calls
     if (!vercelToken) {
       const authHeader = request.headers.get('Authorization');
-
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        vercelToken = authHeader.substring(7);
+      if (authHeader?.startsWith('Bearer ')) {
+        vercelToken = authHeader.slice(7);
       }
     }
 
@@ -75,29 +66,21 @@ async function vercelUserLoader({ request, context }: { request: Request; contex
 export const loader = withSecurity(vercelUserLoader, {
   rateLimit: true,
   allowedMethods: ['GET'],
+  requireAuth: true,
 });
 
 async function vercelUserAction({ request, context }: { request: Request; context: any }) {
   try {
     const formData = await request.formData();
     const action = formData.get('action');
-
-    // Get API keys from cookies (server-side only)
-    const cookieHeader = request.headers.get('Cookie');
-    const apiKeys = getApiKeysFromCookie(cookieHeader);
-
-    // Try to get Vercel token from various sources
-    let vercelToken =
-      apiKeys.VITE_VERCEL_ACCESS_TOKEN ||
-      context?.cloudflare?.env?.VITE_VERCEL_ACCESS_TOKEN ||
-      process.env.VITE_VERCEL_ACCESS_TOKEN;
-
-    // Also check for token in request headers (for direct API calls)
+    // Server-only Vercel token (no client cookies, no VITE_ variables)
+    const env = (context as any)?.cloudflare?.env as Record<string, string> | undefined;
+    let vercelToken = env?.VERCEL_ACCESS_TOKEN || process.env.VERCEL_ACCESS_TOKEN;
+    // Optional: Allow explicit Authorization header for direct calls
     if (!vercelToken) {
       const authHeader = request.headers.get('Authorization');
-
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        vercelToken = authHeader.substring(7);
+      if (authHeader?.startsWith('Bearer ')) {
+        vercelToken = authHeader.slice(7);
       }
     }
 
@@ -158,4 +141,5 @@ async function vercelUserAction({ request, context }: { request: Request; contex
 export const action = withSecurity(vercelUserAction, {
   rateLimit: true,
   allowedMethods: ['POST'],
+  requireAuth: true,
 });

@@ -1,4 +1,5 @@
 import { json, type LoaderFunction, type LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { withSecurity } from '~/lib/security';
 
 interface GitInfo {
   local: {
@@ -61,7 +62,7 @@ declare const __GIT_REPO_NAME: string;
  * declare const __GIT_REPO_URL: string;
  */
 
-export const loader: LoaderFunction = async ({ request, context }: LoaderFunctionArgs & { context: AppContext }) => {
+async function gitInfoLoader({ request, context }: LoaderFunctionArgs & { context: AppContext }) {
   console.log('Git info API called with URL:', request.url);
 
   // Handle CORS preflight requests
@@ -329,4 +330,9 @@ export const loader: LoaderFunction = async ({ request, context }: LoaderFunctio
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     },
   });
-};
+}
+
+export const loader = withSecurity(gitInfoLoader, {
+  allowedMethods: ['GET'],
+  rateLimit: true,
+});

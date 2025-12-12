@@ -1,8 +1,9 @@
 import type { LoaderFunction } from '@remix-run/cloudflare';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import { getApiKeysFromCookie } from '~/lib/api/cookies';
+import { withSecurity } from '~/lib/security';
 
-export const loader: LoaderFunction = async ({ context, request }) => {
+async function checkEnvKeyLoader({ context, request }: { context: any; request: Request }) {
   const url = new URL(request.url);
   const provider = url.searchParams.get('provider');
 
@@ -38,4 +39,9 @@ export const loader: LoaderFunction = async ({ context, request }) => {
   );
 
   return Response.json({ isSet });
-};
+}
+
+export const loader = withSecurity(checkEnvKeyLoader, {
+  allowedMethods: ['GET'],
+  rateLimit: true,
+});
