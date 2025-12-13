@@ -89,8 +89,8 @@ export const Head = createHead(() => (
 export const loader = (args: LoaderFunctionArgs) =>  
   authkitLoader(args, async ({ auth }) => {  
     // `auth` contains: user, sessionId, organizationId, accessToken, etc.  
-    // Add global data here if needed (analytics, settings, theme, flags).  
-    return {};  
+    // Return auth so components can access user data via useRouteLoaderData
+    return auth;  
   });
 
 export function Layout({ children }: { children: React.ReactNode }) {  
