@@ -1,6 +1,6 @@
 // app/root.tsx  
 import { useStore } from '@nanostores/react';  
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';  
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/cloudflare';  
 import {  
   Links,  
   Meta,  
