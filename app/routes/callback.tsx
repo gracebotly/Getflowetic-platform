@@ -1,8 +1,6 @@
 import type { LoaderFunctionArgs } from '@remix-run/cloudflare';
-import pkg from '@workos-inc/authkit-remix';
-
-const { handleAuth } = pkg;
+import { authkitLoader } from '@workos-inc/authkit-remix';
 
 export const loader = (args: LoaderFunctionArgs) => {
-  return handleAuth()(args);
+  return authkitLoader(args);
 };
