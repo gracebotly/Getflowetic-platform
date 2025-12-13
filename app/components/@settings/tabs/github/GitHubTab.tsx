@@ -899,10 +899,16 @@ export default function GitHubTab() {
   const rootData = useRouteLoaderData<typeof rootLoader>('root');
   const workosUser = rootData?.user;
 
+  console.log('🔍 DEBUG - rootData:', rootData);
+  console.log('🔍 DEBUG - workosUser:', workosUser);
+  console.log('🔍 DEBUG - workosUser.id:', workosUser?.id);
+
   const convexUser = useQuery(
     api.users.getByWorkosId,
     workosUser?.id ? { workosId: workosUser.id } : "skip"
   );
+
+  console.log('🔍 DEBUG - convexUser:', convexUser);
 
   const clientsData = useQuery(
     api.clients.list,
