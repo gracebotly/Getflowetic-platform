@@ -3,7 +3,7 @@ import { useStore } from '@nanostores/react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { useRouteLoaderData } from '@remix-run/react';
 import { useMutation } from 'convex/react';
-import { api } from '~/convex/_generated/api';
+import { api } from 'convex/_generated/api';
 import type { loader as rootLoader } from '~/root';
 import { classNames } from '~/utils/classNames';
 import { TabTile } from '~/components/@settings/shared/components/TabTile';
