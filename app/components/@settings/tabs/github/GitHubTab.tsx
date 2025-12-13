@@ -885,7 +885,7 @@ const ConnectionDetailsModal = ({
 // MAIN CLIENTS TAB COMPONENT
 // ==========================================
 
-export function ClientsTab() {
+export function GitHubTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showAddClientModal, setShowAddClientModal] = useState(false);
