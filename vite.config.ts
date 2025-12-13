@@ -91,6 +91,9 @@ export default defineConfig((config) => {
         '**/tests/preview/**', // Exclude preview tests that require Playwright
       ],
     },
+    ssr: {
+      noExternal: ['convex'],
+    },
   };
 });
 
