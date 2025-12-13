@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { withSecurity } from '~/lib/security';
 
 async function healthLoader({ request: _request }: LoaderFunctionArgs) {
