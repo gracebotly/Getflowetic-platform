@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '~/convex/_generated/api';
+import { api } from 'convex/_generated/api';
 import { useRouteLoaderData } from '@remix-run/react';
 import type { loader as rootLoader } from '~/root';
 import { 
