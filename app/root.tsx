@@ -19,6 +19,8 @@ import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';  
 import { HTML5Backend } from 'react-dnd-html5-backend';  
 import { ClientOnly } from 'remix-utils/client-only';  
+import { ConvexProvider } from 'convex/react';  
+import { convex } from '~/lib/convexClient';  
 import { cssTransition, ToastContainer } from 'react-toastify';
 
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';  
@@ -101,7 +103,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (  
     <>  
       <ClientOnly>  
-        {() => <DndProvider backend={HTML5Backend}>{children}</DndProvider>}  
+        {() => (
+          <ConvexProvider client={convex}>
+            <DndProvider backend={HTML5Backend}>{children}</DndProvider>
+          </ConvexProvider>
+        )}
       </ClientOnly>  
       <ToastContainer  
         closeButton={({ closeToast }) => (  
