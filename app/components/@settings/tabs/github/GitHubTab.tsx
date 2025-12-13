@@ -1,5 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '~/convex/_generated/api';
+import { useRouteLoaderData } from '@remix-run/react';
+import type { loader as rootLoader } from '~/root';
 import { 
   Users, 
   Plus, 
@@ -85,51 +89,7 @@ interface ConnectionDetails {
 // MOCK DATA
 // ==========================================
 
-const mockClients: Client[] = [
-  {
-    id: '1',
-    name: 'ABC Dental',
-    email: 'contact@abcdental.com',
-    subdomain: 'abc-dental',
-    status: 'connected',
-    statusMessage: '2m ago',
-    dashboardCount: 2,
-    activeDashboards: 2,
-    magicLinkCount: 1,
-    industry: 'Healthcare',
-    connectionType: 'Vapi Webhook',
-    webhookUrl: 'https://getflowetic.com/webhooks/abc-dental-xyz123',
-    totalRecords: 1247,
-    createdAt: 'Dec 3, 2025',
-  },
-  {
-    id: '2',
-    name: 'XYZ Real Estate',
-    email: 'admin@xyzrealestate.com',
-    subdomain: 'xyz-realestate',
-    status: 'not-connected',
-    dashboardCount: 1,
-    activeDashboards: 0,
-    magicLinkCount: 0,
-    industry: 'Real Estate',
-  },
-  {
-    id: '3',
-    name: '123 Legal Services',
-    email: 'tech@123legal.com',
-    subdomain: 'legal123',
-    status: 'schema-changed',
-    statusMessage: '5h ago',
-    dashboardCount: 3,
-    activeDashboards: 3,
-    magicLinkCount: 2,
-    industry: 'Legal',
-    connectionType: 'Retell Webhook',
-    webhookUrl: 'https://getflowetic.com/webhooks/legal123-abc456',
-    totalRecords: 892,
-    createdAt: 'Nov 28, 2025',
-  },
-];
+
 
 const mockMagicLinks: Record<string, MagicLink[]> = {
   '1': [
@@ -268,7 +228,17 @@ const StatusBadge = ({ status, message }: { status: Client['status']; message?: 
 // ADD NEW CLIENT MODAL
 // ==========================================
 
-const AddNewClientModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const AddNewClientModal = ({ 
+  isOpen, 
+  onClose, 
+  convexUser, 
+  createClient 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  convexUser: any;
+  createClient: any;
+}) => {
   const [clientName, setClientName] = useState('');
   const [email, setEmail] = useState('');
   const [subdomain, setSubdomain] = useState('');
@@ -284,11 +254,32 @@ const AddNewClientModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     setSubdomainAvailable(sanitized.length > 2);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Creating client:', { clientName, email, subdomain, industry, notes, connectDataSource });
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!convexUser) {
+    console.error('User not synced to Convex yet');
+    return;
+  }
+
+  try {
+    const formData = new FormData(e.target as HTMLFormElement);
+    const clientData = {
+      userId: convexUser._id,
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      subdomain: formData.get('subdomain') as string,
+      industry: formData.get('industry') as string || undefined,
+      notes: formData.get('notes') as string || undefined,
+    };
+
+    await createClient(clientData);
+    console.log('✅ Client created successfully');
     onClose();
-  };
+  } catch (error) {
+    console.error('❌ Failed to create client:', error);
+  }
+};
 
   if (!isOpen) return null;
 
@@ -895,23 +886,87 @@ const ConnectionDetailsModal = ({
 // ==========================================
 
 export function ClientsTab() {
-  const [clients, setClients] = useState<Client[]>(mockClients);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [activeModal, setActiveModal] = useState<'magicLinks' | 'connection' | null>(null);
 
-  const filteredClients = clients.filter((client) => {
-    const matchesSearch = 
-      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.subdomain.toLowerCase().includes(searchQuery.toLowerCase());
+  // ==========================================
+  // CONVEX DATA
+  // ==========================================
+  
+  const rootData = useRouteLoaderData<typeof rootLoader>('root');
+  const workosUser = rootData?.user;
 
-    const matchesFilter = filterStatus === 'all' || client.status === filterStatus;
+  const convexUser = useQuery(
+    api.users.getByWorkosId,
+    workosUser?.id ? { workosId: workosUser.id } : "skip"
+  );
 
-    return matchesSearch && matchesFilter;
-  });
+  const clientsData = useQuery(
+    api.clients.list,
+    convexUser ? { userId: convexUser._id } : "skip"
+  );
+
+  const createClient = useMutation(api.clients.create);
+  const updateClient = useMutation(api.clients.update);
+  const deleteClient = useMutation(api.clients.remove);
+
+  const clients = useMemo(() => {
+    if (!clientsData) return [];
+    
+    return clientsData.map(client => ({
+      id: client._id,
+      name: client.name,
+      email: client.email,
+      subdomain: client.subdomain,
+      status: client.status,
+      statusMessage: client.statusMessage,
+      lastConnected: client.lastConnected,
+      dashboardCount: client.dashboardCount,
+      activeDashboards: client.activeDashboards,
+      magicLinkCount: client.magicLinkCount,
+      industry: client.industry,
+      notes: client.notes,
+      connectionType: client.connectionType,
+      webhookUrl: client.webhookUrl,
+      totalRecords: client.totalRecords,
+      createdAt: client.createdAt,
+    }));
+  }, [clientsData]);
+
+  const filteredClients = useMemo(() => {
+  let filtered = [...clients];
+
+  if (searchQuery) {
+    filtered = filtered.filter(
+      (client) =>
+        client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        client.subdomain.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
+  if (filterStatus !== 'all') {
+    filtered = filtered.filter((client) => client.status === filterStatus);
+  }
+
+  return filtered;
+}, [clients, searchQuery, filterStatus]);
+
+  if (clientsData === undefined || convexUser === undefined) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark">
+            Loading clients...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-hidden flex flex-col">
@@ -1081,7 +1136,18 @@ export function ClientsTab() {
                   <button className="flex items-center gap-2 px-4 py-2 bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark rounded-lg hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-4 transition-colors text-sm border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark">
                     Edit Client
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors text-sm border border-red-500/20">
+                  <button 
+                    onClick={async () => {
+                      if (!confirm(`Are you sure you want to delete ${client.name}?`)) return;
+
+                      try {
+                        await deleteClient({ clientId: client.id as any });
+                        console.log('✅ Client deleted');
+                      } catch (error) {
+                        console.error('❌ Failed to delete client:', error);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors text-sm border border-red-500/20">
                     <Trash2 className="w-4 h-4" />
                     Delete
                   </button>
@@ -1119,6 +1185,8 @@ export function ClientsTab() {
       <AddNewClientModal 
         isOpen={showAddClientModal} 
         onClose={() => setShowAddClientModal(false)} 
+        convexUser={convexUser}
+        createClient={createClient}
       />
       
       {selectedClient && (
