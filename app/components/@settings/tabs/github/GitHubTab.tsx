@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from 'convex/_generated/api';
 import { useRouteLoaderData } from '@remix-run/react';
@@ -909,6 +909,24 @@ export default function GitHubTab() {
   );
 
   console.log('🔍 DEBUG - convexUser:', convexUser);
+
+  // NEW CODE: Sync user to Convex if not exists
+  const syncUser = useMutation(api.users.syncUser);
+
+  useEffect(() => {
+    if (workosUser && convexUser === null) {
+      // User logged in but doesn't exist in Convex yet
+      syncUser({
+        workosId: workosUser.id,
+        email: workosUser.email,
+        name: workosUser.firstName || workosUser.email,
+      }).then(() => {
+        console.log('✅ User synced to Convex');
+      }).catch((error) => {
+        console.error('❌ Failed to sync user:', error);
+      });
+    }
+  }, [workosUser, convexUser, syncUser]);
 
   const clientsData = useQuery(
     api.clients.list,
