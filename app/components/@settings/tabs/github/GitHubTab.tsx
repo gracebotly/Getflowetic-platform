@@ -897,7 +897,7 @@ export default function GitHubTab() {
   // ==========================================
   
   const rootData = useRouteLoaderData<typeof rootLoader>('root');
-  const workosUser = rootData?.user;
+  const workosUser = rootData?.data?.user;
 
   console.log('🔍 DEBUG - rootData:', rootData);
   console.log('🔍 DEBUG - workosUser:', workosUser);
