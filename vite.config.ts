@@ -6,11 +6,15 @@ import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import { installGlobals } from '@remix-run/node';
+import { vercelPreset } from '@vercel/remix/vite';
 
 // Load environment variables from multiple files
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 dotenv.config();
+
+installGlobals();
 
 export default defineConfig((config) => {
   return {
@@ -55,6 +59,7 @@ export default defineConfig((config) => {
       },
       config.mode !== 'test' && remixCloudflareDevProxy(),
       remixVitePlugin({
+        presets: [vercelPreset()],
         future: {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,
