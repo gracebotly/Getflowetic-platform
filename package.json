@@ -13,7 +13,7 @@
   "scripts": {
     "preinstall": "node -e \"if(!/pnpm/.test(process.env.npm_config_user_agent||'')){console.error('\\n⚠️  This repo requires pnpm. Run: npm install -g pnpm@9.14.4\\n');process.exit(1)}\"",
     "deploy": "npm run build && wrangler pages deploy",
-    "build": "remix vite:build",
+    "build": "convex deploy --cmd 'remix vite:build'",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
