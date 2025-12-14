@@ -1,4 +1,4 @@
-import { createCookie } from '@remix-run/cloudflare';
+import { createCookie } from '@remix-run/node';
 const BYOK_COOKIE_NAME = 'byok_v1';
 const byokCookie = createCookie(BYOK_COOKIE_NAME, {
     httpOnly: true,
