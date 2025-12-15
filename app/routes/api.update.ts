@@ -1,4 +1,4 @@
-import { json, type ActionFunction } from '@remix-run/cloudflare';
+import { json, type ActionFunction } from '@remix-run/node';
 import { withSecurity } from '~/lib/security';
 
 async function updateAction({ request }: { request: Request }) {

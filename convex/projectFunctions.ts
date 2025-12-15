@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { MutationCtx, QueryCtx } from '../_generated/server';
+import { MutationCtx, QueryCtx } from './_generated/server';
 import { getUserId } from './helpers';
 
 export async function createProject(

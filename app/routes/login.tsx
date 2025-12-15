@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from '@remix-run/cloudflare';
-import { redirect } from '@remix-run/cloudflare';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { getSignInUrl } from '@workos-inc/authkit-remix';
 
 /**
