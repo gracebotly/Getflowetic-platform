@@ -13,7 +13,7 @@ export async function createProject(
   const now = Date.now();
 
   return await ctx.db.insert('projects', {
-    userId,
+    userId: userId as any,
     name,
     description,
     files: {
@@ -40,7 +40,7 @@ export async function getProjects(ctx: QueryCtx) {
 
   return await ctx.db
     .query('projects')
-    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .withIndex('by_user', (q) => q.eq('userId', userId as any))
     .order('desc')
     .collect();
 }
@@ -50,7 +50,7 @@ export async function getProject(ctx: QueryCtx, projectId: string) {
   if (!userId) throw new Error('Unauthorized');
 
   const project = await ctx.db.get(projectId as any);
-  if (!project || project.userId !== userId) {
+  if (!project || (project as any).userId !== userId) {
     throw new Error('Project not found');
   }
 
@@ -72,11 +72,11 @@ export async function updateProject(
   if (!userId) throw new Error('Unauthorized');
 
   const project = await ctx.db.get(projectId as any);
-  if (!project || project.userId !== userId) {
+  if (!project || (project as any).userId !== userId) {
     throw new Error('Project not found');
   }
 
-  await ctx.db.patch(projectId, {
+  await ctx.db.patch(projectId as any, {
     ...updates,
     updatedAt: Date.now(),
   });
@@ -87,9 +87,9 @@ export async function deleteProject(ctx: MutationCtx, projectId: string) {
   if (!userId) throw new Error('Unauthorized');
 
   const project = await ctx.db.get(projectId as any);
-  if (!project || project.userId !== userId) {
+  if (!project || (project as any).userId !== userId) {
     throw new Error('Project not found');
   }
 
-  await ctx.db.delete(projectId);
+  await ctx.db.delete(projectId as any);
 }

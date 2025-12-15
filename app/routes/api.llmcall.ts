@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs } from '@remix-run/node';
+import type { CloudflareContext } from '~/types/env';
 import { streamText } from '~/lib/.server/llm/stream-text';
 import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { generateText } from 'ai';
@@ -64,7 +65,7 @@ function validateTokenLimits(modelDetails: ModelInfo, requestedTokens: number): 
   return { valid: true };
 }
 
-async function llmCallAction({ context, request }: ActionFunctionArgs) {
+async function llmCallAction({ context, request }: ActionFunctionArgs & CloudflareContext) {
   const { system, message, model, provider, streamOutput } = await request.json<{
     system: string;
     message: string;
@@ -106,7 +107,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
             content: `${message}`,
           },
         ],
-        env: context.cloudflare?.env as any,
+        env: context?.cloudflare?.env,
         apiKeys,
         providerSettings,
       });
@@ -151,7 +152,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
     }
   } else {
     try {
-      const models = await getModelList({ apiKeys, providerSettings, serverEnv: context.cloudflare?.env as any });
+      const models = await getModelList({ apiKeys, providerSettings, serverEnv: context?.cloudflare?.env });
       const modelDetails = models.find((m: ModelInfo) => m.name === model);
 
       if (!modelDetails) {
@@ -196,7 +197,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
         ],
         model: providerInfo.getModelInstance({
           model: modelDetails.name,
-          serverEnv: context.cloudflare?.env as any,
+          serverEnv: context?.cloudflare?.env,
           apiKeys,
           providerSettings,
         }),
