@@ -32,6 +32,11 @@ export default defineConfig((config) => {
     },
     optimizeDeps: {
       exclude: ['undici', '@remix-run/node'],
+      esbuildOptions: {
+        loader: {
+          '.js': 'jsx'
+        }
+      }
     },
     plugins: [
       nodePolyfills({
