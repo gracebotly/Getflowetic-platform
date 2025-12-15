@@ -1,5 +1,24 @@
-import { QueryCtx, MutationCtx } from '../_generated/server';
-import { AIProvider } from '../../app/types';
+import { QueryCtx, MutationCtx } from './_generated/server';
+
+// AIProvider type definition
+export interface AIModel {
+  id: string;
+  name: string;
+  contextLength: number;
+  pricing: {
+    input: number;
+    output: number;
+  };
+}
+
+export interface AIProvider {
+  id: string;
+  name: string;
+  models: AIModel[];
+  hasApiKey: boolean;
+  isValidating?: boolean;
+  lastValidated?: Date;
+}
 
 export async function getUserId(ctx: QueryCtx | MutationCtx): Promise<string | null> {
   return null;
