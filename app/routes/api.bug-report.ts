@@ -1,6 +1,7 @@
 import { json, type ActionFunctionArgs } from '@remix-run/node';
 import { Octokit } from '@octokit/rest';
 import { z } from 'zod';
+import type { CloudflareContext } from '~/types/env';
 
 // Rate limiting store (in production, use Redis or similar)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -141,7 +142,7 @@ function formatIssueBody(data: z.infer<typeof bugReportSchema>): string {
   return body;
 }
 
-export async function action({ request, context }: ActionFunctionArgs) {
+export async function action({ request, context }: ActionFunctionArgs & CloudflareContext) {
   // Only allow POST requests
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed' }, { status: 405 });
@@ -192,9 +193,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     // Get GitHub configuration
     const githubToken =
-      (context?.cloudflare?.env as any)?.GITHUB_BUG_REPORT_TOKEN || process.env.GITHUB_BUG_REPORT_TOKEN;
+      context?.cloudflare?.env?.GITHUB_BUG_REPORT_TOKEN || process.env.GITHUB_BUG_REPORT_TOKEN;
     const targetRepo =
-      (context?.cloudflare?.env as any)?.BUG_REPORT_REPO || process.env.BUG_REPORT_REPO || 'stackblitz-labs/bolt.diy';
+      context?.cloudflare?.env?.BUG_REPORT_REPO || process.env.BUG_REPORT_REPO || 'stackblitz-labs/bolt.diy';
 
     if (!githubToken) {
       console.error('GitHub bug report token not configured');

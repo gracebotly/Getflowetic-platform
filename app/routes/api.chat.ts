@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs } from '@remix-run/node';
+import type { CloudflareContext } from '~/types/env';
 import { createDataStream, generateId } from 'ai';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS, type FileMap } from '~/lib/.server/llm/constants';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
@@ -39,7 +40,7 @@ function parseCookies(cookieHeader: string): Record<string, string> {
   return cookies;
 }
 
-async function chatAction({ context, request }: ActionFunctionArgs) {
+async function chatAction({ context, request }: ActionFunctionArgs & CloudflareContext) {
   const streamRecovery = new StreamRecoveryManager({
     timeout: 45000,
     maxRetries: 2,
@@ -120,7 +121,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
           summary = await createSummary({
             messages: [...processedMessages],
-            env: context.cloudflare?.env,
+            env: context?.cloudflare?.env,
             apiKeys,
             providerSettings,
             promptId,
@@ -162,7 +163,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           console.log(`Messages count: ${processedMessages.length}`);
           filteredFiles = await selectContext({
             messages: [...processedMessages],
-            env: context.cloudflare?.env,
+            env: context?.cloudflare?.env,
             apiKeys,
             files,
             providerSettings,
@@ -268,7 +269,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
             const result = await streamText({
               messages: [...processedMessages],
-              env: context.cloudflare?.env,
+              env: context?.cloudflare?.env,
               options,
               apiKeys,
               files,
@@ -309,7 +310,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
         const result = await streamText({
           messages: [...processedMessages],
-          env: context.cloudflare?.env,
+          env: context?.cloudflare?.env,
           options,
           apiKeys,
           files,
