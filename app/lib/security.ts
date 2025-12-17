@@ -185,11 +185,14 @@ export function withSecurity<T extends (args: ActionFunctionArgs | LoaderFunctio
     const env = (args as any)?.context?.cloudflare?.env as Record<string, string> | undefined;
 
     // Check allowed methods
-    if (options.allowedMethods && !options.allowedMethods.includes(request.method)) {
-      return new Response('Method not allowed', {
-        status: 405,
-        headers: createSecurityHeaders(),
-      });
+    if (options.allowedMethods) {
+      const method = request.method === 'HEAD' ? 'GET' : request.method;
+      if (!options.allowedMethods.includes(method)) {
+        return new Response('Method not allowed', {
+          status: 405,
+          headers: createSecurityHeaders(),
+        });
+      }
     }
 
     // Enforce authentication if required
