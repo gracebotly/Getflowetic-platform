@@ -1,6 +1,6 @@
-import handleRequest from '@vercel/remix-entry-server';
+import { handleRequest } from '@vercel/remix';
 import { RemixServer } from '@remix-run/react';
-import type { EntryContext } from '@remix-run/server-runtime';
+import type { EntryContext } from '@vercel/remix';
 
 export default function (
   request: Request,
