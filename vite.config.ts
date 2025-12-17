@@ -33,13 +33,14 @@ export default defineConfig(({ isSsrBuild }) => {
       remixVitePlugin({
         presets: [vercelPreset()],
       }),
-      // ✅ Only apply polyfills to CLIENT build, NOT server/SSR
       !isSSR && nodePolyfills({
+        include: ["buffer"],
         globals: {
           Buffer: true,
+          global: false,
+          process: false,
         },
-        // Don't polyfill fs for browser
-        exclude: ['fs', 'fs/promises', 'node:fs', 'node:fs/promises'],
+        protocolImports: true,
       }),
       UnoCSS(),
       tsconfigPaths(),
@@ -64,6 +65,7 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     ssr: {
       noExternal: ['convex'],
+      external: isSSR ? [] : ['@remix-run/node', 'undici'],
     },
   };
 });
