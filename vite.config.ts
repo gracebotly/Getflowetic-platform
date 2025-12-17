@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { installGlobals } from '@remix-run/node';
 import { vercelPreset } from '@vercel/remix/vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 // Load environment variables from multiple files
 dotenv.config({ path: '.env.local' });
@@ -31,6 +32,11 @@ export default defineConfig((config) => {
     plugins: [
       remixVitePlugin({
         presets: [vercelPreset()],
+      }),
+      nodePolyfills({
+        globals: {
+          Buffer: true,
+        },
       }),
       UnoCSS(),
       tsconfigPaths(),
