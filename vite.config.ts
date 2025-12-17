@@ -1,8 +1,6 @@
 import { vitePlugin as remixVitePlugin } from '@remix-run/dev';
 import UnoCSS from 'unocss/vite';
 import { defineConfig, type ViteDevServer } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -25,21 +23,16 @@ export default defineConfig((config) => {
       target: 'esnext',
     },
     resolve: {
-      alias: {
-        'node:util/types': fileURLToPath(new URL('./shims/node-util-types.js', import.meta.url)),
-        'util/types': fileURLToPath(new URL('./shims/node-util-types.js', import.meta.url)),
-      },
+      alias: {},
     },
     optimizeDeps: {
-      exclude: ['undici', '@remix-run/node'],
+      exclude: [],
     },
     plugins: [
       remixVitePlugin({
         presets: [vercelPreset()],
       }),
       UnoCSS(),
-      nodePolyfills({}),
-      optimizeCssModules({}),
       tsconfigPaths(),
     ],
         // Only expose client-safe variables with VITE_ prefix
