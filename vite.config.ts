@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { installGlobals } from '@remix-run/node';
 import { vercelPreset } from '@vercel/remix/vite';
+import { vercel } from '@vercel/remix/vite';
 
 // Load environment variables from multiple files
 dotenv.config({ path: '.env.local' });
@@ -34,43 +35,7 @@ export default defineConfig((config) => {
       exclude: ['undici', '@remix-run/node'],
     },
     plugins: [
-      nodePolyfills({
-        include: ['buffer', 'process', 'util', 'stream'],
-        globals: {
-          Buffer: true,
-          process: true,
-          global: true,
-        },
-        protocolImports: true,
-        exclude: ['child_process', 'fs', 'path'],
-      }),
-      {
-        name: 'buffer-polyfill',
-        transform(code, id) {
-          if (id.includes('env.mjs')) {
-            return {
-              code: `import { Buffer } from 'buffer';\n${code}`,
-              map: null,
-            };
-          }
-
-          return null;
-        },
-      },
-
-      remixVitePlugin({
-        presets: [vercelPreset()],
-        future: {
-          v3_fetcherPersist: true,
-          v3_relativeSplatPath: true,
-          v3_throwAbortReason: true,
-          v3_lazyRouteDiscovery: true,
-        },
-      }),
-      UnoCSS(),
-      tsconfigPaths(),
-      chrome129IssuePlugin(),
-      config.mode === 'production' && optimizeCssModules({ apply: 'build' }),
+      vercel(),
     ],
         // Only expose client-safe variables with VITE_ prefix
     envPrefix: ['VITE_'],
