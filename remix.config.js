@@ -5,7 +5,6 @@ export default {
   serverBuildPath: "build/index.js",
   publicPath: "/build/",
   serverModuleFormat: "esm",
-  serverPlatform: "cloudflare-pages",
   future: {
     v3_fetcherPersist: true,
     v3_relativeSplatPath: true,
